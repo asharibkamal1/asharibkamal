@@ -62,8 +62,21 @@ export function SiteFooter() {
           </ul>
         </div>
       </Container>
-      <Container className="border-t border-border py-6 text-xs text-muted">
-        © <CopyrightYear /> {siteConfig.name}. All rights reserved.
+      <Container className="flex flex-col gap-3 border-t border-border py-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+        <p>
+          © <CopyrightYear /> {siteConfig.name}. All rights reserved.
+        </p>
+        <nav aria-label="Legal" className="flex flex-wrap gap-x-5 gap-y-2">
+          <Link href="/privacy" className="hover:text-foreground">
+            Privacy Policy
+          </Link>
+          <Link href="/terms" className="hover:text-foreground">
+            Terms of Service
+          </Link>
+          <Link href="/refund-policy" className="hover:text-foreground">
+            Refund Policy
+          </Link>
+        </nav>
       </Container>
     </footer>
   );

@@ -1,6 +1,7 @@
 import Image from "next/image";
-import { ArrowRight, Download, MapPin } from "lucide-react";
+import { ArrowRight, Download, Gift, MapPin } from "lucide-react";
 import { siteConfig } from "@/config/site";
+import { newsletterConfig } from "@/modules/newsletter/config";
 import { ButtonLink, Container } from "@/shared/ui/primitives";
 import { GitHubIcon, LinkedInIcon } from "@/shared/ui/brand-icons";
 
@@ -8,10 +9,13 @@ export function ProfileHero({
   heading,
   intro,
   showCv = true,
+  focus = "hire",
 }: {
   heading: React.ReactNode;
   intro: string;
   showCv?: boolean;
+  /** "content" leads with the free lead magnet (home page); "hire" leads with freelance work. */
+  focus?: "content" | "hire";
 }) {
   return (
     <section className="hero-glow relative overflow-hidden">
@@ -23,7 +27,7 @@ export function ProfileHero({
               <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
             </span>
-            Available for freelance projects
+            {focus === "content" ? `Free: ${newsletterConfig.leadMagnet.title}` : "Available for freelance projects"}
           </p>
           <h1 className="mt-6 text-4xl font-extrabold tracking-tight text-balance sm:text-5xl lg:text-6xl">
             {heading}
@@ -33,9 +37,20 @@ export function ProfileHero({
             <MapPin className="size-4" /> {siteConfig.location}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <ButtonLink href="/hire-me">
-              Hire me <ArrowRight className="size-4" />
-            </ButtonLink>
+            {focus === "content" ? (
+              <>
+                <ButtonLink href="/newsletter">
+                  <Gift className="size-4" /> Get the free starter kit
+                </ButtonLink>
+                <ButtonLink href="/hire-me" variant="outline">
+                  Hire me <ArrowRight className="size-4" />
+                </ButtonLink>
+              </>
+            ) : (
+              <ButtonLink href="/hire-me">
+                Hire me <ArrowRight className="size-4" />
+              </ButtonLink>
+            )}
             {showCv && siteConfig.cv && (
               <a
                 href={siteConfig.cv}

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { siteConfig } from "@/config/site";
 import { JsonLd, personSchema, websiteSchema } from "@/modules/seo";
 import { SiteFooter } from "@/shared/layout/site-footer";
@@ -60,6 +61,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteFooter />
         <JsonLd data={personSchema()} />
         <JsonLd data={websiteSchema()} />
+        {/* Cookie-free page-view analytics; enable it in Vercel → Analytics. */}
+        <Analytics />
       </body>
     </html>
   );

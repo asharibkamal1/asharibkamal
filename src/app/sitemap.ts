@@ -21,7 +21,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entry("/newsletter", 0.8),
     entry("/products", 0.8),
     entry("/resources", 0.6),
+    entry("/about", 0.7),
     entry("/contact", 0.5),
+    entry("/privacy", 0.2),
+    entry("/terms", 0.2),
+    entry("/refund-policy", 0.2),
     ...getAllPosts()
       .filter((p) => !p.draft)
       .map((p) => entry(`/blog/${p.slug}`, 0.7, p.updated ?? p.date)),

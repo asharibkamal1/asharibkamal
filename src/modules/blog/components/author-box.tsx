@@ -20,8 +20,8 @@ export function AuthorBox() {
         <p className="mt-1 text-sm leading-relaxed text-muted">
           {siteConfig.role} with 5+ years building enterprise systems. I write about software engineering, AI and
           earning online.{" "}
-          <Link href="/portfolio" className="font-medium text-brand-2 hover:underline">
-            See my work
+          <Link href="/about" className="font-medium text-brand-2 hover:underline">
+            More about me
           </Link>
         </p>
       </div>

@@ -88,8 +88,8 @@ export function SearchDialog() {
         className="inline-flex h-9 items-center gap-2 rounded-full border border-border bg-surface px-3 text-sm text-muted transition-colors hover:text-foreground"
       >
         <Search className="size-4" />
-        <span className="hidden lg:inline">Search</span>
-        <kbd className="hidden rounded border border-border px-1.5 font-mono text-[10px] lg:inline">Ctrl K</kbd>
+        <span className="hidden xl:inline">Search</span>
+        <kbd className="hidden rounded border border-border px-1.5 font-mono text-[10px] whitespace-nowrap xl:inline">Ctrl K</kbd>
       </button>
 
       <dialog

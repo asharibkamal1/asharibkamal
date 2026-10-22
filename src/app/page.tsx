@@ -1,15 +1,43 @@
-import { ArrowRight, BriefcaseBusiness, Code2, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowRight, Code2, Sparkles, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { getAllPosts, PostCard } from "@/modules/blog";
 import { NewsletterCta } from "@/modules/newsletter";
 import { projects, ProfileHero, ProjectCard, ServicesGrid, StatsRow, TestimonialsSection } from "@/modules/portfolio";
-import { ButtonLink, Card, Container, SectionHeading } from "@/shared/ui/primitives";
+import { ButtonLink, Container, SectionHeading } from "@/shared/ui/primitives";
 
-const pillars = [
-  { icon: Sparkles, title: "AI & Trends", text: "New AI tools, AI-assisted coding and how to use AI in real work and business." },
-  { icon: Code2, title: "Software Engineering", text: ".NET, architecture, clean code and the career lessons from 5+ years in production." },
-  { icon: TrendingUp, title: "Earn Online", text: "Freelancing, digital products and building passive income as a developer." },
-  { icon: BriefcaseBusiness, title: "Business Guides", text: "Starting and growing an online business — SEO, marketing, tools and productivity." },
+// "Start here": one learning path per audience, each pointing at the content that serves it.
+const paths = [
+  {
+    icon: Code2,
+    step: "Path 1",
+    title: "Become a better .NET engineer",
+    text: "Clean Architecture, APIs, background services and the habits that make code survive production.",
+    links: [
+      { label: "Software engineering articles", href: "/blog/category/software-engineering" },
+      { label: ".NET Clean Architecture Starter Kit", href: "/products/dotnet-clean-architecture-starter-kit" },
+    ],
+  },
+  {
+    icon: Sparkles,
+    step: "Path 2",
+    title: "Build faster with AI",
+    text: "The AI tools and workflows I actually use — and how to use them without lowering code quality.",
+    links: [
+      { label: "AI & trends articles", href: "/blog/category/ai" },
+      { label: "Tools I use", href: "/resources" },
+    ],
+  },
+  {
+    icon: TrendingUp,
+    step: "Path 3",
+    title: "Earn online as a developer",
+    text: "Freelancing, remote work, digital products and building a business alongside your job.",
+    links: [
+      { label: "Free side-income starter kit", href: "/newsletter" },
+      { label: "Earn online articles", href: "/blog/category/earn-online" },
+      { label: "Business guides", href: "/blog/category/business" },
+    ],
+  },
 ];
 
 export default function HomePage() {
@@ -24,23 +52,39 @@ export default function HomePage() {
           </>
         }
         intro="I'm Asharib Kamal, a Senior .NET Engineer with 5+ years delivering enterprise systems for tax, insurance and manufacturing. Here I share practical guides on software engineering, AI and building online income."
+        focus="content"
       />
 
       <StatsRow />
 
-      <Container className="py-24">
+      <Container className="py-24" id="start-here">
         <SectionHeading
-          eyebrow="What I write about"
-          title="Practical guides for developers and builders"
-          description="No fluff. Real lessons from building production systems and launching my own products."
+          eyebrow="Start here"
+          title="Pick your path"
+          description="No fluff. Real lessons from building production systems and launching my own products — choose where you want to grow."
         />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {pillars.map(({ icon: Icon, title, text }) => (
-            <Card key={title} className="hover:border-brand-2/50">
-              <Icon className="size-6 text-brand-2" />
-              <h3 className="mt-4 font-semibold">{title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{text}</p>
-            </Card>
+        <div className="grid gap-4 lg:grid-cols-3">
+          {paths.map(({ icon: Icon, step, title, text, links }) => (
+            <div key={title} className="flex flex-col rounded-2xl border border-border bg-surface p-6 transition-colors hover:border-brand-2/50">
+              <div className="flex items-center justify-between">
+                <span className="bg-gradient-brand inline-flex size-11 items-center justify-center rounded-xl text-white">
+                  <Icon className="size-5" />
+                </span>
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted">{step}</span>
+              </div>
+              <h3 className="mt-5 text-xl font-bold">{title}</h3>
+              <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{text}</p>
+              <ul className="mt-5 space-y-2 border-t border-border pt-5">
+                {links.map((l) => (
+                  <li key={l.href}>
+                    <Link href={l.href} className="group inline-flex items-center gap-1.5 text-sm font-medium hover:text-brand-2">
+                      <ArrowRight className="size-3.5 text-brand-2 transition-transform group-hover:translate-x-0.5" />
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
         </div>
       </Container>

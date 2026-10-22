@@ -7,6 +7,7 @@ import type { SearchItem } from "@/modules/search/types";
 // Static search index, built once at build time and fetched by the search dialog when opened.
 export async function GET() {
   const pages: SearchItem[] = [
+    { type: "page", title: "About", description: "My story, experience and why I built this site", href: "/about" },
     { type: "page", title: "Portfolio", description: "Projects, experience and skills", href: "/portfolio" },
     { type: "page", title: "Hire Me", description: "Freelance .NET and SaaS development", href: "/hire-me" },
     { type: "page", title: "Newsletter", description: "The Build & Earn Letter — weekly", href: "/newsletter" },

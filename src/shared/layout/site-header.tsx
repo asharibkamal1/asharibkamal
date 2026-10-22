@@ -27,13 +27,13 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
+        <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
           {siteConfig.nav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "rounded-full px-4 py-2 text-sm font-medium transition-colors",
+                "rounded-full px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors xl:px-4",
                 isActive(item.href) ? "bg-surface-2 text-foreground" : "text-muted hover:text-foreground",
               )}
             >
@@ -45,12 +45,12 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           <SearchDialog />
           <ThemeToggle />
-          <ButtonLink href="/hire-me" className="hidden sm:inline-flex">
+          <ButtonLink href="/hire-me" className="hidden whitespace-nowrap sm:inline-flex">
             Work with me
           </ButtonLink>
           <button
             type="button"
-            className="inline-flex size-9 items-center justify-center rounded-full border border-border md:hidden"
+            className="inline-flex size-9 items-center justify-center rounded-full border border-border lg:hidden"
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
@@ -61,7 +61,7 @@ export function SiteHeader() {
       </Container>
 
       {open && (
-        <nav aria-label="Mobile" className="border-t border-border bg-background md:hidden">
+        <nav aria-label="Mobile" className="border-t border-border bg-background lg:hidden">
           <Container className="flex flex-col py-3">
             {siteConfig.nav.map((item) => (
               <Link
