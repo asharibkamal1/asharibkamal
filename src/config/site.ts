@@ -1,10 +1,18 @@
 // Single source of truth for brand, links and navigation.
 // Change values here — every page, metadata tag and JSON-LD block reads from this file.
 
+// Canonical origin for SEO tags, sitemap and social cards. An explicit NEXT_PUBLIC_SITE_URL wins;
+// otherwise use the production domain Vercel is serving (the *.vercel.app URL today, and
+// asharibkamal.com automatically once it's added as the production domain in Vercel).
+const productionHost =
+  process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_PROJECT_PRODUCTION_URL;
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ?? (productionHost ? `https://${productionHost}` : "https://asharibkamal.com");
+
 export const siteConfig = {
   name: "Asharib Kamal",
-  domain: "asharibkamal.com",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://asharibkamal.com",
+  domain: new URL(siteUrl).host,
+  url: siteUrl,
   title: "Asharib Kamal — Senior .NET Engineer, Builder & Writer",
   tagline: "Software engineering, AI and online business — practical guides to build skills and earn online.",
   description:
