@@ -1,5 +1,5 @@
 export type SearchItem = {
-  type: "post" | "project" | "page";
+  type: "post" | "product" | "project" | "page";
   title: string;
   description: string;
   href: string;

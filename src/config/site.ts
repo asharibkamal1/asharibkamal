@@ -20,9 +20,9 @@ export const siteConfig = {
     github: "https://github.com/asharibkamal1",
   },
   nav: [
-    { label: "Home", href: "/" },
     { label: "Portfolio", href: "/portfolio" },
     { label: "Blog", href: "/blog" },
+    { label: "Products", href: "/products" },
     { label: "Newsletter", href: "/newsletter" },
     { label: "Hire Me", href: "/hire-me" },
   ],

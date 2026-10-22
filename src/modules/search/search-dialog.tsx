@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FileText, FolderKanban, Link2, Search } from "lucide-react";
+import { FileText, FolderKanban, Link2, Package, Search } from "lucide-react";
 import { cn } from "@/shared/ui/primitives";
 import type { SearchItem } from "./types";
 
 const typeMeta = {
   post: { label: "Article", icon: FileText },
+  product: { label: "Product", icon: Package },
   project: { label: "Project", icon: FolderKanban },
   page: { label: "Page", icon: Link2 },
 } as const;

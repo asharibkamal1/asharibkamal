@@ -1,6 +1,7 @@
 import { siteConfig } from "@/config/site";
 import { getAllPosts, getCategory } from "@/modules/blog";
 import { projects } from "@/modules/portfolio";
+import { products } from "@/modules/products";
 import type { SearchItem } from "@/modules/search/types";
 
 // Static search index, built once at build time and fetched by the search dialog when opened.
@@ -31,5 +32,13 @@ export async function GET() {
     keywords: p.tags.join(" "),
   }));
 
-  return Response.json([...posts, ...projectItems, ...pages]);
+  const productItems: SearchItem[] = products.map((p) => ({
+    type: "product",
+    title: p.title,
+    description: p.tagline,
+    href: `/products/${p.slug}`,
+    keywords: p.kind,
+  }));
+
+  return Response.json([...posts, ...productItems, ...projectItems, ...pages]);
 }
