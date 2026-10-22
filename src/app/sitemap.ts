@@ -18,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entry("/portfolio", 0.8),
     entry("/hire-me", 0.8),
     entry("/newsletter", 0.8),
+    entry("/resources", 0.6),
     entry("/contact", 0.5),
     ...getAllPosts()
       .filter((p) => !p.draft)

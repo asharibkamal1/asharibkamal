@@ -7,6 +7,7 @@ import { Menu, X } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { ButtonLink, Container, cn } from "@/shared/ui/primitives";
 import { ThemeToggle } from "@/shared/ui/theme-toggle";
+import { SearchDialog } from "@/modules/search";
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -42,6 +43,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <SearchDialog />
           <ThemeToggle />
           <ButtonLink href="/hire-me" className="hidden sm:inline-flex">
             Work with me

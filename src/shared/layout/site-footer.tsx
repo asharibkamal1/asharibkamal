@@ -34,7 +34,7 @@ export function SiteFooter() {
         <div>
           <p className="text-sm font-semibold">Explore</p>
           <ul className="mt-3 space-y-2 text-sm text-muted">
-            {[...siteConfig.nav, { label: "Contact", href: "/contact" }].map((item) => (
+            {[...siteConfig.nav, { label: "Tools I Use", href: "/resources" }, { label: "Contact", href: "/contact" }].map((item) => (
               <li key={item.href}>
                 <Link href={item.href} className="hover:text-foreground">
                   {item.label}
