@@ -1,0 +1,149 @@
+---
+title: "Clean Architecture in ASP.NET Core: A Practical Guide (2026)"
+description: "How to structure a real ASP.NET Core project with Clean Architecture — the four layers, what goes where, dependency rules, and the mistakes I see in production codebases."
+date: 2026-10-20
+category: software-engineering
+tags: [dotnet, aspnet-core, clean-architecture, csharp]
+featured: true
+draft: true
+---
+
+Most .NET projects don't fail because of bad algorithms. They fail because, two years in, nobody can change anything without breaking something else. Clean Architecture is one of the most practical ways I know to prevent that.
+
+In this guide I'll show you how I structure ASP.NET Core projects, what belongs in each layer, and the mistakes I see most often in enterprise codebases.
+
+## What Clean Architecture actually is
+
+Clean Architecture is one rule: **dependencies point inward**. Your business rules sit in the middle and know nothing about databases, frameworks or the web. Everything else depends on them — never the other way around.
+
+<Callout type="tip" title="The one-sentence version">
+If you can swap SQL Server for PostgreSQL without touching your business logic, you're doing it right.
+</Callout>
+
+## The four layers
+
+| Layer | Contains | Depends on |
+| --- | --- | --- |
+| **Domain** | Entities, value objects, domain rules | Nothing |
+| **Application** | Use cases, interfaces, DTOs, validation | Domain |
+| **Infrastructure** | EF Core, email, file storage, external APIs | Application |
+| **API / Presentation** | Controllers or minimal APIs, DI setup | Application, Infrastructure |
+
+### Solution structure
+
+```text
+src/
+├── MyApp.Domain/
+├── MyApp.Application/
+├── MyApp.Infrastructure/
+└── MyApp.Api/
+tests/
+├── MyApp.Domain.Tests/
+└── MyApp.Application.Tests/
+```
+
+## The Domain layer
+
+Entities protect their own rules. Notice there are no public setters — the only way to change an invoice is through a method that enforces the rules.
+
+```csharp title="MyApp.Domain/Invoices/Invoice.cs" {12-15}
+public sealed class Invoice
+{
+    private readonly List<InvoiceLine> _lines = [];
+
+    public Guid Id { get; private set; } = Guid.NewGuid();
+    public string CustomerName { get; private set; }
+    public InvoiceStatus Status { get; private set; } = InvoiceStatus.Draft;
+    public IReadOnlyList<InvoiceLine> Lines => _lines;
+
+    public void AddLine(string product, int quantity, decimal unitPrice)
+    {
+        if (Status != InvoiceStatus.Draft)
+            throw new DomainException("Only draft invoices can be changed.");
+        if (quantity <= 0)
+            throw new DomainException("Quantity must be positive.");
+
+        _lines.Add(new InvoiceLine(product, quantity, unitPrice));
+    }
+
+    public decimal Total => _lines.Sum(l => l.Quantity * l.UnitPrice);
+}
+```
+
+## The Application layer
+
+This is where use cases live. The Application layer defines **interfaces** for what it needs — it never references EF Core directly.
+
+```csharp title="MyApp.Application/Abstractions/IInvoiceRepository.cs"
+public interface IInvoiceRepository
+{
+    Task<Invoice?> GetByIdAsync(Guid id, CancellationToken ct);
+    void Add(Invoice invoice);
+}
+```
+
+```csharp title="MyApp.Application/Invoices/AddInvoiceLine.cs"
+public sealed record AddInvoiceLineCommand(Guid InvoiceId, string Product, int Quantity, decimal UnitPrice);
+
+public sealed class AddInvoiceLineHandler(IInvoiceRepository invoices, IUnitOfWork unitOfWork)
+{
+    public async Task<Result> Handle(AddInvoiceLineCommand cmd, CancellationToken ct)
+    {
+        var invoice = await invoices.GetByIdAsync(cmd.InvoiceId, ct);
+        if (invoice is null)
+            return Result.NotFound("Invoice not found.");
+
+        invoice.AddLine(cmd.Product, cmd.Quantity, cmd.UnitPrice);
+        await unitOfWork.SaveChangesAsync(ct);
+        return Result.Success();
+    }
+}
+```
+
+## The Infrastructure layer
+
+Infrastructure implements the interfaces. This is the only place EF Core appears.
+
+```csharp title="MyApp.Infrastructure/Persistence/InvoiceRepository.cs"
+internal sealed class InvoiceRepository(AppDbContext db) : IInvoiceRepository
+{
+    public Task<Invoice?> GetByIdAsync(Guid id, CancellationToken ct) =>
+        db.Invoices.Include(i => i.Lines).FirstOrDefaultAsync(i => i.Id == id, ct);
+
+    public void Add(Invoice invoice) => db.Invoices.Add(invoice);
+}
+```
+
+## The API layer
+
+Controllers (or minimal API endpoints) stay thin: map the request, call the use case, map the result.
+
+```csharp title="MyApp.Api/Endpoints/InvoiceEndpoints.cs"
+app.MapPost("/invoices/{id:guid}/lines", async (
+    Guid id, AddLineRequest req, AddInvoiceLineHandler handler, CancellationToken ct) =>
+{
+    var result = await handler.Handle(new(id, req.Product, req.Quantity, req.UnitPrice), ct);
+    return result.ToHttpResult();
+});
+```
+
+## Common mistakes I see in production
+
+1. **Leaking EF Core into the Application layer** — returning `IQueryable` from repositories ties your use cases to the ORM.
+2. **Anemic entities** — public setters everywhere, with all rules in services. The domain becomes a bag of data.
+3. **Too many layers for a small app** — a 5-endpoint internal tool doesn't need four projects. Start simpler and grow.
+4. **One giant "Services" folder** — organise by feature (`Invoices/`, `Customers/`), not by technical type.
+
+<Callout type="warning" title="Don't over-engineer">
+Clean Architecture pays off on long-lived systems with real business rules. For a weekend prototype, a single project is fine.
+</Callout>
+
+## Summary
+
+- Dependencies point inward — Domain depends on nothing.
+- Entities protect their own rules.
+- Application defines interfaces; Infrastructure implements them.
+- Keep the API layer thin.
+- Organise by feature, and don't add layers you don't need.
+
+{/* TODO (Asharib): add a short story from your own projects — e.g. a change that was easy because of this structure. Then remove `draft: true` above to publish. */}

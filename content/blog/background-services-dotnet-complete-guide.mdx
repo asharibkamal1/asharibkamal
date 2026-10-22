@@ -1,0 +1,136 @@
+---
+title: "Background Services in .NET: The Complete Guide"
+description: "Run scheduled jobs, queues and long-running tasks in ASP.NET Core with BackgroundService — scoped services, graceful shutdown, error handling and production tips."
+date: 2026-10-18
+category: software-engineering
+tags: [dotnet, background-services, aspnet-core, csharp]
+draft: true
+---
+
+Almost every real system needs work that happens outside a web request: sending emails, syncing with external APIs, cleaning old data, generating reports. In .NET, the built-in answer is `BackgroundService`.
+
+## What is a BackgroundService?
+
+`BackgroundService` is a base class for long-running work hosted inside your app. It starts with the application and stops when the application shuts down.
+
+```csharp title="Workers/HeartbeatWorker.cs"
+public sealed class HeartbeatWorker(ILogger<HeartbeatWorker> logger) : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromMinutes(1));
+        while (await timer.WaitForNextTickAsync(stoppingToken))
+        {
+            logger.LogInformation("Heartbeat at {Time}", DateTimeOffset.UtcNow);
+        }
+    }
+}
+```
+
+Register it in `Program.cs`:
+
+```csharp
+builder.Services.AddHostedService<HeartbeatWorker>();
+```
+
+## Using scoped services (like DbContext)
+
+A background service is a **singleton**. You can't inject a scoped `DbContext` directly — create a scope for each unit of work instead.
+
+```csharp title="Workers/CleanupWorker.cs" {9-10}
+public sealed class CleanupWorker(IServiceScopeFactory scopeFactory, ILogger<CleanupWorker> logger)
+    : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromHours(1));
+        while (await timer.WaitForNextTickAsync(stoppingToken))
+        {
+            await using var scope = scopeFactory.CreateAsyncScope();
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            var cutoff = DateTime.UtcNow.AddDays(-30);
+            var deleted = await db.AuditLogs
+                .Where(l => l.CreatedAt < cutoff)
+                .ExecuteDeleteAsync(stoppingToken);
+
+            logger.LogInformation("Deleted {Count} old audit logs", deleted);
+        }
+    }
+}
+```
+
+## Handling errors without killing the worker
+
+An unhandled exception stops your background service — and by default, since .NET 6, it **stops the whole host**. Catch errors inside the loop:
+
+```csharp
+while (await timer.WaitForNextTickAsync(stoppingToken))
+{
+    try
+    {
+        await DoWorkAsync(stoppingToken);
+    }
+    catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+    {
+        break; // normal shutdown
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Background job failed; will retry on next tick");
+    }
+}
+```
+
+<Callout type="info">
+You can change the host behaviour with `HostOptions.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore`, but handling errors explicitly is clearer.
+</Callout>
+
+## A simple in-memory queue with Channels
+
+For "fire and forget" work triggered by a request (like sending a welcome email), use `System.Threading.Channels`:
+
+```csharp title="Queue/EmailQueue.cs"
+public sealed class EmailQueue
+{
+    private readonly Channel<EmailMessage> _channel = Channel.CreateBounded<EmailMessage>(100);
+
+    public ValueTask EnqueueAsync(EmailMessage msg, CancellationToken ct) => _channel.Writer.WriteAsync(msg, ct);
+    public IAsyncEnumerable<EmailMessage> ReadAllAsync(CancellationToken ct) => _channel.Reader.ReadAllAsync(ct);
+}
+
+public sealed class EmailWorker(EmailQueue queue, IServiceScopeFactory scopes) : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        await foreach (var msg in queue.ReadAllAsync(stoppingToken))
+        {
+            await using var scope = scopes.CreateAsyncScope();
+            var sender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
+            await sender.SendAsync(msg, stoppingToken);
+        }
+    }
+}
+```
+
+<Callout type="warning" title="In-memory means lost on restart">
+If the app restarts, queued items are gone. For work that must not be lost, use a durable queue (a database outbox table, Azure Service Bus, RabbitMQ) or a library like Hangfire or Quartz.NET.
+</Callout>
+
+## When to use a library instead
+
+| Need | Use |
+| --- | --- |
+| Simple interval jobs | `BackgroundService` + `PeriodicTimer` |
+| Cron schedules, retries, dashboard | Hangfire or Quartz.NET |
+| Durable messaging between services | Azure Service Bus, RabbitMQ, MassTransit |
+
+## Production checklist
+
+- Always respect the `CancellationToken` for graceful shutdown.
+- Create a scope per unit of work for scoped services.
+- Catch and log exceptions inside the loop.
+- Make jobs **idempotent** — safe to run twice.
+- If you run multiple instances, make sure a job doesn't run on every instance at once (use a distributed lock or a scheduler library).
+
+{/* TODO (Asharib): add a real example from your experience with background services in production, then remove `draft: true`. */}
