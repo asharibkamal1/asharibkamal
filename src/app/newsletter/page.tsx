@@ -5,7 +5,7 @@ import { Card, Container, Eyebrow, SectionHeading } from "@/shared/ui/primitives
 
 export const metadata = pageMetadata({
   title: `${newsletterConfig.name} — Free Weekly Newsletter`,
-  description: `${newsletterConfig.pitch} Join free and get the ${newsletterConfig.leadMagnet.title}.`,
+  description: `A free weekly email on software engineering, AI and earning online. Join and get the ${newsletterConfig.leadMagnet.title}.`,
   path: "/newsletter",
 });
 

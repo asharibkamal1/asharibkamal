@@ -21,7 +21,7 @@ export const siteConfig = {
   title: "Asharib Kamal — Senior .NET Engineer, Builder & Writer",
   tagline: "Software engineering, AI and online business — practical guides to build skills and earn online.",
   description:
-    "Asharib Kamal is a Senior Software Engineer (.NET Core) from Islamabad with 5+ years building enterprise systems. Practical guides on software engineering, AI, and building online income — plus freelance .NET and SaaS development.",
+    "Senior .NET engineer from Islamabad sharing practical guides on software engineering, AI and earning online — plus freelance .NET and SaaS development.",
   role: "Senior Software Engineer (.NET Core)",
   location: "Islamabad, Pakistan",
   email: "asharibkamal1@gmail.com",

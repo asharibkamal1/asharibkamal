@@ -30,7 +30,8 @@ export async function generateMetadata({ params }: PageProps<"/blog/[slug]">) {
   if (!post) return {};
   const path = `/blog/${slug}`;
   return {
-    title: post.title,
+    // Google shows ~60 characters; drop the "— Asharib Kamal" suffix when it would push the title past that.
+    title: post.title.length > 44 ? { absolute: post.title } : post.title,
     description: post.description,
     keywords: post.tags,
     alternates: { canonical: path },
