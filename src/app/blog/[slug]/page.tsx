@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageProps<"/blog/[slug]">) {
     description: post.description,
     keywords: post.tags,
     alternates: { canonical: path },
-    robots: post.draft ? { index: false, follow: false } : undefined,
+    robots: post.draft || !siteConfig.launched ? { index: false, follow: false } : undefined,
     openGraph: {
       type: "article",
       title: post.title,

@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     description: siteConfig.description,
   },
   twitter: { card: "summary_large_image", title: siteConfig.title, description: siteConfig.description },
-  robots: { index: true, follow: true },
+  robots: siteConfig.launched ? { index: true, follow: true } : { index: false, follow: false },
 };
 
 export const viewport: Viewport = {

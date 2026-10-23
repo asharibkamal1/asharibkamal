@@ -10,6 +10,11 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? (productionHost ? `https://${productionHost}` : "https://asharibkamal.com");
 
 export const siteConfig = {
+  /**
+   * Launch switch. While false, search engines are asked not to crawl or index the site
+   * (robots.txt + noindex). Set to true on launch day, after the custom domain is connected.
+   */
+  launched: false,
   name: "Asharib Kamal",
   domain: new URL(siteUrl).host,
   url: siteUrl,
