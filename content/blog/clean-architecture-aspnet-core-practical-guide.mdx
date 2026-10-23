@@ -1,11 +1,11 @@
 ---
 title: "Clean Architecture in ASP.NET Core: A Practical Guide (2026)"
 description: "How to structure a real ASP.NET Core project with Clean Architecture — the four layers, what goes where, dependency rules, and the mistakes I see in production codebases."
-date: 2026-10-20
+date: 2026-10-23
 category: software-engineering
 tags: [dotnet, aspnet-core, clean-architecture, csharp]
 featured: true
-draft: true
+draft: false
 ---
 
 Most .NET projects don't fail because of bad algorithms. They fail because, two years in, nobody can change anything without breaking something else. Clean Architecture is one of the most practical ways I know to prevent that.
@@ -100,6 +100,8 @@ public sealed class AddInvoiceLineHandler(IInvoiceRepository invoices, IUnitOfWo
 }
 ```
 
+`Result` here is a small result type (your own, or a library such as ErrorOr or FluentResults) that lets handlers report outcomes like "not found" without throwing exceptions. The API layer turns it into an HTTP response.
+
 ## The Infrastructure layer
 
 Infrastructure implements the interfaces. This is the only place EF Core appears.
@@ -146,4 +148,3 @@ Clean Architecture pays off on long-lived systems with real business rules. For 
 - Keep the API layer thin.
 - Organise by feature, and don't add layers you don't need.
 
-{/* TODO (Asharib): add a short story from your own projects — e.g. a change that was easy because of this structure. Then remove `draft: true` above to publish. */}

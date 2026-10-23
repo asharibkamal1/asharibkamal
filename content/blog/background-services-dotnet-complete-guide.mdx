@@ -1,10 +1,10 @@
 ---
 title: "Background Services in .NET: The Complete Guide"
 description: "Run scheduled jobs, queues and long-running tasks in ASP.NET Core with BackgroundService — scoped services, graceful shutdown, error handling and production tips."
-date: 2026-10-18
+date: 2026-10-23
 category: software-engineering
 tags: [dotnet, background-services, aspnet-core, csharp]
-draft: true
+draft: false
 ---
 
 Almost every real system needs work that happens outside a web request: sending emails, syncing with external APIs, cleaning old data, generating reports. In .NET, the built-in answer is `BackgroundService`.
@@ -133,4 +133,3 @@ If the app restarts, queued items are gone. For work that must not be lost, use 
 - Make jobs **idempotent** — safe to run twice.
 - If you run multiple instances, make sure a job doesn't run on every instance at once (use a distributed lock or a scheduler library).
 
-{/* TODO (Asharib): add a real example from your experience with background services in production, then remove `draft: true`. */}
